@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[22]:
+# In[ ]:
 
 
 # I just started exploring sktime and figured this competition would be a good learning opportunity. 
@@ -19,7 +19,7 @@
 pip install sktime
 
 
-# In[23]:
+# In[ ]:
 
 
 import pandas as pd
@@ -31,13 +31,15 @@ import itertools
 import matplotlib.pyplot as plt
 import lightgbm as lgb
 from pylab import rcParams
+from sklearn.metrics import mean_squared_log_error
 from statsmodels.tsa.seasonal import seasonal_decompose
 
+
 rcParams['figure.figsize'] = 18, 8
 rcParams['figure.figsize'] = 18, 8
 
 
-# In[24]:
+# In[ ]:
 
 
 from sktime.forecasting.base import ForecastingHorizon
@@ -53,7 +55,7 @@ from sktime.forecasting.compose import (
 )
 
 
-# In[25]:
+# In[ ]:
 
 
 # W/ DATE COLUMN - 'parse_dates='date' (date column)
@@ -64,7 +66,7 @@ holidays = pd.read_csv('../input/store-sales-time-series-forecasting/holidays_ev
 test = pd.read_csv('../input/store-sales-time-series-forecasting/test.csv', parse_dates=['date'])
 
 
-# In[26]:
+# In[ ]:
 
 
 # NO DATE COLUMN - 'index_col=0' (index/id column)
@@ -72,13 +74,13 @@ stores = pd.read_csv('../input/store-sales-time-series-forecasting/stores.csv', 
 sample = pd.read_csv('../input/store-sales-time-series-forecasting/sample_submission.csv', index_col=0)
 
 
-# In[27]:
+# In[ ]:
 
 
 train.head()
 
 
-# In[28]:
+# In[ ]:
 
 
 #For the sake of demonstration, we will train our model on monthly aggregated Sales data of a particular store# Select sales for Store 1 Only.
@@ -88,7 +90,7 @@ store1_agg.index = pd.to_datetime(store1_agg.index)
 store1_agg_monthly = store1_agg.resample('M').sum()
 
 
-# In[29]:
+# In[ ]:
 
 
 #--------------------Visulaize Data on a Time Plot------------------
@@ -99,7 +101,7 @@ plt.title("Store-1 Sales Data aggreagted at Month Level")
 plt.show()
 
 
-# In[30]:
+# In[ ]:
 
 
 #Annual Seasonal Decomposition
@@ -107,7 +109,7 @@ seasonal_decompose(store1_agg_monthly,model="multiplicative",period=12).plot()
 plt.show()
 
 
-# In[31]:
+# In[ ]:
 
 
 #--------------------Time Series Train-Test split-------------------#
@@ -115,7 +117,19 @@ store1_agg_monthly.index = store1_agg_monthly.index.to_period('M')
 y_train, y_test = temporal_train_test_split(store1_agg_monthly, test_size=0.2)
 
 
-# In[32]:
+# In[ ]:
+
+
+y_train.head()
+
+
+# In[ ]:
+
+
+y_train.tail()
+
+
+# In[ ]:
 
 
 #--------------------------Detrender-----------------------------
@@ -135,7 +149,7 @@ y_pred = forecaster.fit(y_train).predict(fh=fh_ins)
 plot_series(y_train, y_pred, y_resid, labels=["y_train", "fitted linear trend", "residuals"]);
 
 
-# In[33]:
+# In[ ]:
 
 
 #--------------------------Deseasonalizer---------------------------
@@ -146,13 +160,13 @@ plot_series(deseasonalizer.fit_transform(y_train))
 seasonal = deseasonalizer.fit_transform(y_train)
 
 
-# In[34]:
+# In[ ]:
 
 
 regressor = lgb.LGBMRegressor()
 
 
-# In[36]:
+# In[ ]:
 
 
 forecaster = make_reduction(
@@ -161,7 +175,7 @@ forecaster = make_reduction(
 )
 
 
-# In[41]:
+# In[ ]:
 
 
 #----------------------------Create Pipeline--------------------
@@ -194,7 +208,7 @@ def get_transformed_target_forecaster(alpha,params):
     return forecaster
 
 
-# In[42]:
+# In[ ]:
 
 
 #-------------------Fitting an Auto Regressive Light-GBM------------
@@ -230,7 +244,13 @@ store1_agg_monthly.name = "original"
 forecasts.append(store1_agg_monthly)
 
 
-# In[44]:
+# In[ ]:
+
+
+error = mean_squared_log_error(y_test, y_pred)
+
+
+# In[ ]:
 
 
 #-------------------Final Plotting of Forecasts------------------
@@ -249,7 +269,7 @@ sns.lineplot(data = plot_data,
         markers=['o','o'],
 )
 
-plt.title("Final Forecast")
+plt.title(f"Final Forecast - Error: {error}")
 plt.show()
 
 
