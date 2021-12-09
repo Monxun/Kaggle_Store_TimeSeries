@@ -16,8 +16,6 @@
 # In[ ]:
 
 
-pip install sktime
-
 
 # In[ ]:
 
@@ -59,19 +57,19 @@ from sktime.forecasting.compose import (
 
 
 # W/ DATE COLUMN - 'parse_dates='date' (date column)
-train = pd.read_csv('../input/store-sales-time-series-forecasting/train.csv', parse_dates=['date'])
-transactions = pd.read_csv('../input/store-sales-time-series-forecasting/transactions.csv', parse_dates=['date'])
-oil = pd.read_csv('../input/store-sales-time-series-forecasting/oil.csv', parse_dates=['date'])
-holidays = pd.read_csv('../input/store-sales-time-series-forecasting/holidays_events.csv', parse_dates=['date'])
-test = pd.read_csv('../input/store-sales-time-series-forecasting/test.csv', parse_dates=['date'])
+train = pd.read_csv('data/train.csv', parse_dates=['date'])
+transactions = pd.read_csv('data/transactions.csv', parse_dates=['date'])
+oil = pd.read_csv('data/oil.csv', parse_dates=['date'])
+holidays = pd.read_csv('data/holidays_events.csv', parse_dates=['date'])
+test = pd.read_csv('data/test.csv', parse_dates=['date'])
 
 
 # In[ ]:
 
 
 # NO DATE COLUMN - 'index_col=0' (index/id column)
-stores = pd.read_csv('../input/store-sales-time-series-forecasting/stores.csv', index_col=0)
-sample = pd.read_csv('../input/store-sales-time-series-forecasting/sample_submission.csv', index_col=0)
+stores = pd.read_csv('data/stores.csv', index_col=0)
+sample = pd.read_csv('data/sample_submission.csv', index_col=0)
 
 
 # In[ ]:
